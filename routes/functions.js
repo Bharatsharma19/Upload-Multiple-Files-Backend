@@ -30,4 +30,41 @@ router.post("/checkconnection", upload.any("picture"), function (req, res) {
   }
 });
 
+router.post("/add", upload.any(), function (req, res) {
+  var obj = {};
+
+  req.files.map((item) => {
+    if (!obj[item.fieldname]) {
+      obj[item.fieldname] = [];
+    }
+    obj[item.fieldname].push(item.filename);
+  });
+
+  for (let key in obj) {
+    obj[key] = obj[key].join();
+  }
+
+  req.body = { ...req.body, ...obj };
+
+  pool.query("insert into files set ?", req.body, function (error, result) {
+    if (error) {
+      console.log(error);
+      res.status(500).json({ status: false });
+    } else {
+      res.status(200).json({ status: true, data: req.body });
+    }
+  });
+});
+
+router.get("/displayall", function (req, res) {
+  pool.query("select * from files", function (error, result) {
+    if (error) {
+      console.log(error);
+      res.status(500).json({ status: false, data: [] });
+    } else {
+      res.status(200).json({ status: true, data: result });
+    }
+  });
+});
+
 module.exports = router;
