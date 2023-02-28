@@ -9,6 +9,9 @@
 /coverage
 
 # production
+*.png
+*.jpg
+*.pdf
 /build
 
 # misc
